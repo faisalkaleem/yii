@@ -7,9 +7,29 @@
  */
 class requiredIf extends CValidator {
 
-  public $value = null;
+  /**
+   *
+   * @var mixed
+   */
   public $field;
+  
+  /**
+   *
+   * @var mixed
+   */
+  public $value = null;
+  
+  /**
+   * Currently not used.
+   * @var boolean
+   */
   public $not = false;
+  
+  /**
+   *
+   * @var string
+   */
+  public $required_value = null;
 
   /**
    * Validates the attribute of the object.
@@ -20,14 +40,26 @@ class requiredIf extends CValidator {
    */
   protected function validateAttribute($object, $attribute) {
     $field = $this->field;
-    $result = false;
 
-    if (empty($object->$attribute) && $object->$field == $this->value) {
-      $message = $this->message !== null ? $this->message : Yii::t('yii', '{attribute} is required.');
-    } else {
-      $result = true;
+    $validated = true;
+    if(!is_array($this->field)) {
+      throw new CException(Yii::t('yii', 'The "value" property must be array because array give in "field" parameter.'));
     }
-    if (!$result) {
+    $true_count = 0;
+    
+    if($this->required_value) {
+      $is_attribute_value_invalid = $object->$attribute != $this->required_value;
+    } else {
+      $is_attribute_value_invalid = empty($object->$attribute);
+    }
+    foreach($this->field as $f => $v) {
+      if ($is_attribute_value_invalid && $object->$f == $v) {
+        $true_count++;
+      }
+    }
+    
+    if ($true_count==count($this->field)) {
+      $message = $this->message !== null ? $this->message : Yii::t('yii', '{attribute} is required.');
       $this->addError($object, $attribute, $message);
     }
   }
