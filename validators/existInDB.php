@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of requiredIf
+ * Validates whether the submitted array of values exist in database table or not.
  *
  * @author Faisal Kaleem
  */
