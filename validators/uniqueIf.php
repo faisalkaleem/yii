@@ -1,15 +1,18 @@
 <?php
 
 /**
- * Description of requiredIf
+ * Conditionally required attribute.
+ * @uses CUniqueValidator
  *
  * @author Faisal Kaleem
  */
 class uniqueIf extends CValidator {
 
   /**
-   *
-   * @var mixed
+   * Key value pair array
+   * Keys will be treated as attribute names.
+   * 
+   * @var array
    */
   public $field;
 
@@ -23,11 +26,8 @@ class uniqueIf extends CValidator {
    */
   protected function validateAttribute($object, $attribute) {
     if(!is_array($this->field)) {
-      throw new CException(Yii::t('yii', 'The "field" property must be array because array of key values parameters.'));
+      throw new CException(Yii::t('yii', 'The "field" property must be an array of key values parameters.'));
     }
-    $unique_validator = new CUniqueValidator();
-    $is_unique = $unique_validator->validateAttribute($object, $attribute);
-    $object->clearErrors($attribute);
     
     $true_count = 0;
     foreach($this->field as $f => $v) {
@@ -35,10 +35,14 @@ class uniqueIf extends CValidator {
         $true_count++;
       }
     }
-    
-    if ($true_count==count($this->field) && !$is_unique) {
-      $message = $this->message !== null ? $this->message : Yii::t('yii', '{attribute} is duplicate.');
-      $this->addError($object, $attribute, $message);
+    if ($true_count==count($this->field)) {
+      $previous_error_count = count($object->getErrors($attribute));
+      $unique_validator = new CUniqueValidator();
+      $unique_validator->validateAttribute($object, $attribute);
+      if($previous_error_count < count($object->getErrors($attribute))) {
+        $message = $this->message !== null ? $this->message : Yii::t('yii', '{attribute} is duplicate.');
+        $this->addError($object, $attribute, $message);
+      }
     }
   }
   
