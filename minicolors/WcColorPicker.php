@@ -88,14 +88,8 @@ class WcColorPicker extends CWidget {
    * @return void
    */
   public function init() {
-    if($this->model) {
-      $input_id = CHtml::activeId($this->model, $this->attribute);
-    } else if($this->name){
-      $input_id = CHtml::getIdByName($this->name);
-    } else {
-      throw new CException("Neither model nor name mentioned.", 500);
-    }
-
+    $this->getGenerateId();
+    $input_id = $this->getId();
     $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'jquery-minicolors';
     $baseUrl = Yii::app()->getAssetManager()->publish($dir);
     $cs = Yii::app()->getClientScript();
@@ -123,6 +117,24 @@ class WcColorPicker extends CWidget {
         echo CHtml::hiddenField($this->name, $this->value, $this->htmlOptions);
       else
         echo CHtml::textField($this->name, $this->value, $this->htmlOptions);
+    }
+  }
+  
+  /**
+   * Generated Input Id
+   * Can be used in the javascript.
+   * 
+   * @throws CException
+   */
+  private function getGenerateId() {
+    if($this->model) {
+      $this->setId(CHtml::activeId($this->model, $this->attribute));
+    } else if(isset($this->htmlOptions['id']) && !empty($this->htmlOptions['id'])) {
+      $this->setId($this->htmlOptions['id']);
+    } else if($this->name){
+      $this->setId(CHtml::getIdByName($this->name));
+    } else {
+      throw new CException("Neither model nor name mentioned.", 500);
     }
   }
 
