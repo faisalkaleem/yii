@@ -38,10 +38,7 @@ class requiredIf extends CValidator {
    * @param string $attribute the attribute being validated
    * @throws CException if given {@link range} is not an array
    */
-  protected function validateAttribute($object, $attribute) {
-    $field = $this->field;
-
-    $validated = true;
+  protected function validateAttribute($object, $attribute) {    
     if(!is_array($this->field)) {
       throw new CException(Yii::t('yii', 'The "value" property must be array because array give in "field" parameter.'));
     }
